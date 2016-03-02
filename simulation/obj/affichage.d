@@ -1,0 +1,10 @@
+.\simulation\obj\affichage.o: src\lib\affichage\affichage.c
+.\simulation\obj\affichage.o: .\src\constC.h
+.\simulation\obj\affichage.o: src\lib\affichage\lpc17xx_uart.h
+.\simulation\obj\affichage.o: C:\Keil\ARM\Inc\NXP\LPC17xx\LPC17xx.h
+.\simulation\obj\affichage.o: .\src\lib\cmsis\core_cm3.h
+.\simulation\obj\affichage.o: C:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+.\simulation\obj\affichage.o: .\src\lib\cmsis\core_cmInstr.h
+.\simulation\obj\affichage.o: .\src\lib\cmsis\core_cmFunc.h
+.\simulation\obj\affichage.o: C:\Keil\ARM\Inc\NXP\LPC17xx\system_LPC17xx.h
+.\simulation\obj\affichage.o: src\lib\affichage\lpc_types.h

@@ -1,0 +1,684 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ;/******************************************************
+                       ********************//**
+    2 00000000         ; * @file     allocateur.s
+    3 00000000         ; * @brief    
+    4 00000000         ; *           
+    5 00000000         ; * @version  V1.0
+    6 00000000         ; * @date     
+    7 00000000         ; *
+    8 00000000         ; * @note
+    9 00000000         ; * 
+   10 00000000         ; *
+   11 00000000         ; * @par
+   12 00000000         ; * 
+   13 00000000         ; *
+   14 00000000         ; * @par
+   15 00000000         ; * 
+   16 00000000         ; *
+   17 00000000         ; ******************************************************
+                       ************************/
+   18 00000000         
+   19 00000000         ; constantes
+   20 00000000         
+   21 00000000 00000040 
+                       Stack_Size
+                               EQU              0x00000040
+   22 00000000         
+   23 00000000 00000001 
+                       controleThreadNP
+                               EQU              0x1         ; valeur pour contr
+                                                            ole avec mode threa
+                                                            d non privilégié
+   24 00000000         ; pour la pile c'est lors de retour d'exceprion qu'elle 
+                       est positionnée
+   25 00000000 01000000 
+                       xPSRInitial
+                               EQU              0x01000000  ; xPSR avec juste T
+                                                            humb à 1, le reste 
+                                                            est à 0 (comme suit
+                                                            e à un reset)
+   26 00000000         
+   27 00000000 FFFFFFFD 
+                       LRThreadPSP
+                               EQU              0xFFFFFFFD  ; valeur de la pseu
+                                                            do @ de retour pour
+                                                             une exception en r
+                                                            evenant en mode
+   28 00000000         ; thread avec utilisation de la pile PSP
+   29 00000000         
+   30 00000000         ; area => ALIGN implicit de 4 octets
+   31 00000000         ; ici area data standard initialisé
+   32 00000000         
+   33 00000000                 AREA             |.data|, DATA, READWRITE
+   34 00000000         
+   35 00000000         ; les piles sont à aligner sur 8 octets en cas de gestio
+                       n des nombres flottants, comme ce n'est pas le cas avec
+   36 00000000         ; notre projet, nous ne devrions pas être embeté
+   37 00000000         ; cependant il est toujours préférable de respecter les 
+                       conventions afin d'éviter tous problèmes
+   38 00000000         
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   39 00000000         ; SPACE ne gère pas l'alignement et les area sont pas dé
+                       faut sur des adresses doublement paires, on va donc forc
+                       er
+   40 00000000         ; l'alignement sur une adresse triplement paires
+   41 00000000         
+   42 00000000                 ALIGN            8
+   43 00000000         
+   44 00000000         ; Pile PSP pour demoRestitution
+   45 00000000         
+   46 00000000 00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+
+
+
+ARM Macro Assembler    Page 4 
+
+
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+
+
+
+ARM Macro Assembler    Page 5 
+
+
+              00 00 00 
+              00 00 00 
+              00 00            SPACE            8*Stack_Size ; on multiplie la 
+                                                            pile par 8, on est 
+                                                            sur de conserver l'
+                                                            alignement pour le 
+                                                            début
+   47 00000200         ; de la pile
+   48 00000200         Pile_PSP                             ; rappel le début d
+                                                            e la pile est en ba
+                                                            s
+   49 00000200         
+   50 00000200         ; Pile MSP pour demoRestitution
+   51 00000200         
+   52 00000200 00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+
+
+
+ARM Macro Assembler    Page 6 
+
+
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+
+
+
+ARM Macro Assembler    Page 7 
+
+
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+
+
+
+ARM Macro Assembler    Page 8 
+
+
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00            SPACE            8*Stack_Size
+   53 00000400         Pile_MSP                             ; rappel le début d
+                                                            e la pile est en ba
+                                                            s
+   54 00000400         
+   55 00000400         
+   56 00000400         ; DCD permet l'initialisation et la réservation de 4 oct
+                       ets, il est aligné sur une frontière doublement paire (m
+                       odulo 4 donc)
+   57 00000400         
+   58 00000400         ; Initialisation en dur d'un contexte à restituer
+   59 00000400         
+   60 00000400 00000001 
+                       etatCalcul
+                               DCD              controleThreadNP ; controle
+   61 00000404 00000004        DCD              4           ; R4
+   62 00000408 00000005        DCD              5           ; R5
+   63 0000040C 00000006        DCD              6           ; ...
+   64 00000410 00000007        DCD              7
+   65 00000414 00000008        DCD              8
+   66 00000418 00000009        DCD              9
+   67 0000041C 0000000A        DCD              10
+   68 00000420 0000000B        DCD              11          ; R11
+   69 00000424 00000000        DCD              Pile_PSP    ; PSP
+   70 00000428 00000000        DCD              Pile_MSP    ; MSP
+   71 0000042C FFFFFFFD        DCD              LRThreadPSP ; LR en mode handle
+                                                            r
+   72 00000430         
+   73 00000430         ; area => ALIGN implice de 4 octets
+   74 00000430         ; zone de code
+   75 00000430         
+   76 00000430                 AREA             |.text|, CODE, READONLY
+   77 00000000         
+   78 00000000                 PRESERVE8                    ; le C souhaite une
+                                                             pile sur une @ tri
+                                                            plement double, san
+                                                            s cette option 
+   79 00000000         ; l'assembleur lance des warning comme on s'interface av
+                       ec le langage C
+   80 00000000         ; mais attention, si on veut préserver la pile sur une @
+                        triplement double
+   81 00000000         ; c'est à nous programmeur de faire ce qu'il faut
+   82 00000000         
+   83 00000000         
+   84 00000000         demoRestitution
+                               PROC
+   85 00000000                 EXPORT           demoRestitution
+   86 00000000         
+   87 00000000         ; fct qui va faire une création de processus/restitution
+                        de contexte à partir d'une structure etatCalcul et
+   88 00000000         ; de piles statiques
+   89 00000000         
+
+
+
+ARM Macro Assembler    Page 9 
+
+
+   90 00000000         ; on est :
+   91 00000000         ;  en mode handler
+   92 00000000         ;  les IT sont désactivé => indivisible/initerruptible
+   93 00000000         ;  la structure à restituer est dans etatCalcul
+   94 00000000         ;  les registres du processeur sont libres et disponible
+                       s
+   95 00000000         ;  la pile MSP est valide
+   96 00000000         
+   97 00000000         
+   98 00000000         ; à vous d'écrire le code ici!!!!!!!!!!!!!!!!!!!!!!!!
+   99 00000000         
+  100 00000000 4816            LDR              R0,=etatCalcul
+  101 00000002 F850 1B04       LDR              R1,[R0],#4
+  102 00000006 F381 8814       MSR              CONTROL,R1
+  103 0000000A F850 1B04       LDR              R1,[R0],#4
+  104 0000000E 460C            MOV              R4,R1
+  105 00000010 F850 1B04       LDR              R1,[R0],#4
+  106 00000014 460D            MOV              R5,R1
+  107 00000016 F850 1B04       LDR              R1,[R0],#4
+  108 0000001A 460E            MOV              R6,R1
+  109 0000001C F850 1B04       LDR              R1,[R0],#4
+  110 00000020 460F            MOV              R7,R1
+  111 00000022 F850 1B04       LDR              R1,[R0],#4
+  112 00000026 4688            MOV              R8,R1
+  113 00000028 F850 1B04       LDR              R1,[R0],#4
+  114 0000002C 4689            MOV              R9,R1
+  115 0000002E F850 1B04       LDR              R1,[R0],#4
+  116 00000032 468A            MOV              R10,R1
+  117 00000034 F850 1B04       LDR              R1,[R0],#4
+  118 00000038 468B            MOV              R11,R1
+  119 0000003A F850 1B04       LDR              R1,[R0],#4
+  120 0000003E F381 8809       MSR              PSP,R1
+  121 00000042 F3BF 8F6F       ISB
+  122 00000046 F850 1B04       LDR              R1,[R0],#4
+  123 0000004A F381 8808       MSR              MSP,R1
+  124 0000004E F3BF 8F6F       ISB
+  125 00000052 F850 1B04       LDR              R1,[R0],#4
+  126 00000056 468E            MOV              LR,R1
+  127 00000058         
+  128 00000058 4770            BX               LR
+  129 0000005A         
+  130 0000005A         ; on ne doit pas passer par ce code, par sécurité on met
+                        une boucle
+  131 0000005A         
+  132 0000005A E7FE            B                .
+  133 0000005C         
+  134 0000005C                 ENDP
+  135 0000005C         
+  136 0000005C                 END
+              00000000 
+Command Line: --debug --xref --cpu=Cortex-M3 --apcs=interwork --depend=.\simula
+tion\obj\allocateur.d -o.\simulation\obj\allocateur.o -IC:\Keil\ARM\RV31\INC -I
+C:\Keil\ARM\CMSIS\Include -IC:\Keil\ARM\Inc\NXP\LPC17xx --predefine="__EVAL SET
+A 1" --predefine="__MICROLIB SETA 1" --list=.\simulation\lst\allocateur.lst src
+\allocateur.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.data 00000000
+
+Symbol: .data
+   Definitions
+      At line 33 in file src\allocateur.s
+   Uses
+      None
+Comment: .data unused
+Pile_MSP 00000400
+
+Symbol: Pile_MSP
+   Definitions
+      At line 53 in file src\allocateur.s
+   Uses
+      At line 70 in file src\allocateur.s
+Comment: Pile_MSP used once
+Pile_PSP 00000200
+
+Symbol: Pile_PSP
+   Definitions
+      At line 48 in file src\allocateur.s
+   Uses
+      At line 69 in file src\allocateur.s
+Comment: Pile_PSP used once
+etatCalcul 00000400
+
+Symbol: etatCalcul
+   Definitions
+      At line 60 in file src\allocateur.s
+   Uses
+      At line 100 in file src\allocateur.s
+Comment: etatCalcul used once
+4 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 76 in file src\allocateur.s
+   Uses
+      None
+Comment: .text unused
+demoRestitution 00000000
+
+Symbol: demoRestitution
+   Definitions
+      At line 84 in file src\allocateur.s
+   Uses
+      At line 85 in file src\allocateur.s
+Comment: demoRestitution used once
+2 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+LRThreadPSP FFFFFFFD
+
+Symbol: LRThreadPSP
+   Definitions
+      At line 27 in file src\allocateur.s
+   Uses
+      At line 71 in file src\allocateur.s
+Comment: LRThreadPSP used once
+Stack_Size 00000040
+
+Symbol: Stack_Size
+   Definitions
+      At line 21 in file src\allocateur.s
+   Uses
+      At line 46 in file src\allocateur.s
+      At line 52 in file src\allocateur.s
+
+controleThreadNP 00000001
+
+Symbol: controleThreadNP
+   Definitions
+      At line 23 in file src\allocateur.s
+   Uses
+      At line 60 in file src\allocateur.s
+Comment: controleThreadNP used once
+xPSRInitial 01000000
+
+Symbol: xPSRInitial
+   Definitions
+      At line 25 in file src\allocateur.s
+   Uses
+      None
+Comment: xPSRInitial unused
+4 symbols
+344 symbols in table

@@ -1,0 +1,32 @@
+*** Creating Trace Output File '.\simulation\obj\projet.tra' Ok.
+### Preparing for ADS-LD.
+### Creating ADS-LD Command Line
+### List of Objects: adding '".\simulation\obj\system_lpc17xx.o"'
+### List of Objects: adding '".\simulation\obj\startup_lpc17xx.o"'
+### List of Objects: adding '".\simulation\obj\core_cm3.o"'
+### List of Objects: adding '".\simulation\obj\affichage.o"'
+### List of Objects: adding '".\simulation\obj\lpc17xx_clkpwr.o"'
+### List of Objects: adding '".\simulation\obj\lpc17xx_pinsel.o"'
+### List of Objects: adding '".\simulation\obj\lpc17xx_uart.o"'
+### List of Objects: adding '".\simulation\obj\serial_uart0_polling.o"'
+### List of Objects: adding '".\simulation\obj\noyau.o"'
+### List of Objects: adding '".\simulation\obj\initnoyau.o"'
+### List of Objects: adding '".\simulation\obj\allocateur.o"'
+### List of Objects: adding '".\simulation\obj\etape1-2.o"'
+### List of Objects: adding '".\simulation\obj\libgestionprocessuser.o"'
+### ADS-LD Command completed:
+--cpu Cortex-M3 ".\simulation\obj\system_lpc17xx.o" ".\simulation\obj\startup_lpc17xx.o" ".\simulation\obj\core_cm3.o" ".\simulation\obj\affichage.o" ".\simulation\obj\lpc17xx_clkpwr.o" ".\simulation\obj\lpc17xx_pinsel.o" ".\simulation\obj\lpc17xx_uart.o" ".\simulation\obj\serial_uart0_polling.o" ".\simulation\obj\noyau.o" ".\simulation\obj\initnoyau.o" ".\simulation\obj\allocateur.o" ".\simulation\obj\etape1-2.o" ".\simulation\obj\libgestionprocessuser.o" 
+--library_type=microlib --strict --scatter ".\simulation\obj\projet.sct" 
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\simulation\lst\projet.map" -o .\simulation\obj\projet.axf### Preparing Environment (PrepEnvAds)
+### ADS-LD Output File: '.\simulation\obj\projet.axf'
+### ADS-LD Command File: '.\simulation\obj\projet.lnp'
+### Checking for dirty Components...
+### Creating CmdFile '.\simulation\obj\projet.lnp', Handle=0x00000780
+### Writing '.lnp' file
+### ADS-LD Command file '.\simulation\obj\projet.lnp' is ready.
+### ADS-LD: About to start ADS-LD Thread.
+### ADS-LD: executed with 0 errors
+### Updating obj list
+### LDADS_file() completed.

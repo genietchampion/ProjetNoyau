@@ -1,0 +1,5 @@
+--cpu Cortex-M3 ".\simulation\obj\system_lpc17xx.o" ".\simulation\obj\startup_lpc17xx.o" ".\simulation\obj\core_cm3.o" ".\simulation\obj\affichage.o" ".\simulation\obj\lpc17xx_clkpwr.o" ".\simulation\obj\lpc17xx_pinsel.o" ".\simulation\obj\lpc17xx_uart.o" ".\simulation\obj\serial_uart0_polling.o" ".\simulation\obj\noyau.o" ".\simulation\obj\initnoyau.o" ".\simulation\obj\allocateur.o" ".\simulation\obj\etape1-2.o" ".\simulation\obj\libgestionprocessuser.o" 
+--library_type=microlib --strict --scatter ".\simulation\obj\projet.sct" 
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\simulation\lst\projet.map" -o .\simulation\obj\projet.axf

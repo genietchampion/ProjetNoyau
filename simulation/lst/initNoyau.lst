@@ -1,0 +1,265 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ;/******************************************************
+                       ********************//**
+    2 00000000         ; * @file     initNoyau.s
+    3 00000000         ; * @brief    
+    4 00000000         ; *           
+    5 00000000         ; * @version  V1.0
+    6 00000000         ; * @date     
+    7 00000000         ; *
+    8 00000000         ; * @note
+    9 00000000         ; * 
+   10 00000000         ; *
+   11 00000000         ; * @par
+   12 00000000         ; * 
+   13 00000000         ; *
+   14 00000000         ; * @par
+   15 00000000         ; * 
+   16 00000000         ; *
+   17 00000000         ; ******************************************************
+                       ************************/
+   18 00000000         
+   19 00000000         ; constantes
+   20 00000000         
+   21 00000000 00000200 
+                       Stack_Size
+                               EQU              0x00000200  ; taille de notre p
+                                                            ile (pas besoin d'u
+                                                            ne grosse pile)
+   22 00000000         
+   23 00000000         
+   24 00000000         ; a priori les piles sont à aligner sur 8 octets en cas 
+                       de gestion des nombres flottants, comme ce n'est pas le 
+                       cas avec
+   25 00000000         ; notre projet, nous ne devrions pas être embeté mais au
+                       tant ne pas prendre de risque.... puisque l'on peut
+   26 00000000         ; on utilise ici une area dédié aux deux piles, c'est pr
+                       imordiale pour la pile MSP, puisque dans le startup, ava
+                       nt l'appel
+   27 00000000         ; à main, on appelle une procédure de la bibliothèque __
+                       main qui s'occupe entre autre de l'initialisation des va
+                       riables et
+   28 00000000         ; des zones, notamment l'area .data va être initialisé à
+                        0 (section data ZI) sauf pour les variables initialisée
+                       s (recopie
+   29 00000000         ; d'une zone ROM vers une zone RAM)
+   30 00000000         
+   31 00000000         ; la pile MSP est normalement défini dans le fichier sta
+                       rtup, sur une frontière de 8 et dans une area spécifique
+                       ,
+   32 00000000         ; on la rapatrier ici dès fois que l'on souhaite modifie
+                       r quelque chose
+   33 00000000         
+   34 00000000                 AREA             STACK, NOINIT, READWRITE, ALIGN
+=3
+   35 00000000         
+   36 00000000                 EXPORT           __initial_sp
+   37 00000000         Stack_Mem
+                               SPACE            Stack_Size  ; réservation d'esp
+                                                            ace
+   38 00000200         __initial_sp
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   39 00000200         
+   40 00000200         ; Gestion de la pile PSP initiale :
+   41 00000200         ;  Comme nous n'en avons pas besoin, je commente le code
+                       , si besoin on peut le réactiver
+   42 00000200         
+   43 00000200         ; on réaligne dès fois que la taille en soit pas un mult
+                       iple de 8
+   44 00000200         
+   45 00000200         ;    ALIGN 8
+   46 00000200         
+   47 00000200         ; espace pour la pile MSP
+   48 00000200         
+   49 00000200         ;    EXPORT Pile_PSP   ; variable publique
+   50 00000200         
+   51 00000200         ;Stack_PSP       SPACE   Stack_Size
+   52 00000200         ;Pile_PSP
+   53 00000200         
+   54 00000200         ; area => ALIGN implicit sur une frontière de 4 octets
+   55 00000200         ; ici area data standard initialisé
+   56 00000200         
+   57 00000200                 AREA             |.data|, DATA, READWRITE
+   58 00000000         
+   59 00000000         ; DCD permet l'inistalisation et la réservation de 4 oct
+                       ets, il est aligné sur une frontière de 4
+   60 00000000         ;    DCD     Reset_Handler             ; Reset Handler
+   61 00000000         
+   62 00000000         
+   63 00000000         ; area => ALIGN implice sur une frontière de 4 octets
+   64 00000000         
+   65 00000000                 AREA             |.text|, CODE, READONLY
+   66 00000000         
+   67 00000000         ; fct appelée par main pour passer en mode handler juste
+                        avant l'initialisation du noyau
+   68 00000000         
+   69 00000000         appelSvcInitNoyau
+                               PROC
+   70 00000000                 EXPORT           appelSvcInitNoyau 
+                                                            ; fonction publique
+                                                            
+   71 00000000         
+   72 00000000 DF00            SVC              #0          ; exception logicie
+                                                            lle
+   73 00000002         
+   74 00000002         ; on ne reviendra plus ici mais afin de parer à tout pro
+                       blème
+   75 00000002         ; vous pouvez imaginer ici un appel à la fonction panicK
+                       ernel
+   76 00000002         
+   77 00000002 E7FE            B                .           ; boucle sans fin
+   78 00000004         
+   79 00000004                 ENDP
+   80 00000004         
+   81 00000004         ; fct appelée lors d'une exception de type SVC (@ positi
+                       onnée dans le vecteur d'interruption de SVC)
+   82 00000004         ; lors des prochaines étapes, il faudra penser à revoir 
+                       cette partie du code (migration dans entreeNoyau.s?)
+   83 00000004         
+   84 00000004         SVC_Handler
+                               PROC
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+   85 00000004                 IMPORT           initNoyau   ; fct C externe
+   86 00000004                 EXPORT           SVC_Handler ; pas d'option weak
+                                                             (voir startup_LPC1
+                                                            7xx.s) 
+   87 00000004         ;  => on va prendre cette étiquette et pas
+   88 00000004         ;     d'erreur du linker pour une double définition
+   89 00000004         
+   90 00000004 F7FF BFFE       B                initNoyau   ; Branch (sans link
+                                                            ) = goto à la fonct
+                                                            ion en C d'initiali
+                                                            sation
+   91 00000008         
+   92 00000008                 ENDP
+   93 00000008         
+   94 00000008                 END                          ; Fin de l'assembla
+                                                            ge
+Command Line: --debug --xref --cpu=Cortex-M3 --apcs=interwork --depend=.\simula
+tion\obj\initNoyau.d -o.\simulation\obj\initNoyau.o -IC:\Keil\ARM\RV31\INC -IC:
+\Keil\ARM\CMSIS\Include -IC:\Keil\ARM\Inc\NXP\LPC17xx --predefine="__EVAL SETA 
+1" --predefine="__MICROLIB SETA 1" --list=.\simulation\lst\initNoyau.lst src\in
+itNoyau.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+STACK 00000000
+
+Symbol: STACK
+   Definitions
+      At line 34 in file src\initNoyau.s
+   Uses
+      None
+Comment: STACK unused
+Stack_Mem 00000000
+
+Symbol: Stack_Mem
+   Definitions
+      At line 37 in file src\initNoyau.s
+   Uses
+      None
+Comment: Stack_Mem unused
+__initial_sp 00000200
+
+Symbol: __initial_sp
+   Definitions
+      At line 38 in file src\initNoyau.s
+   Uses
+      At line 36 in file src\initNoyau.s
+Comment: __initial_sp used once
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.data 00000000
+
+Symbol: .data
+   Definitions
+      At line 57 in file src\initNoyau.s
+   Uses
+      None
+Comment: .data unused
+1 symbol
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 65 in file src\initNoyau.s
+   Uses
+      None
+Comment: .text unused
+SVC_Handler 00000004
+
+Symbol: SVC_Handler
+   Definitions
+      At line 84 in file src\initNoyau.s
+   Uses
+      At line 86 in file src\initNoyau.s
+Comment: SVC_Handler used once
+appelSvcInitNoyau 00000000
+
+Symbol: appelSvcInitNoyau
+   Definitions
+      At line 69 in file src\initNoyau.s
+   Uses
+      At line 70 in file src\initNoyau.s
+Comment: appelSvcInitNoyau used once
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+Stack_Size 00000200
+
+Symbol: Stack_Size
+   Definitions
+      At line 21 in file src\initNoyau.s
+   Uses
+      At line 37 in file src\initNoyau.s
+Comment: Stack_Size used once
+1 symbol
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+External symbols
+
+initNoyau 00000000
+
+Symbol: initNoyau
+   Definitions
+      At line 85 in file src\initNoyau.s
+   Uses
+      At line 90 in file src\initNoyau.s
+Comment: initNoyau used once
+1 symbol
+341 symbols in table
